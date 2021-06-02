@@ -13,9 +13,15 @@ class JWTAuth(BaseAuthentication):
 
     def authenticate(self, request):
         #Check User Authentication
+
+        #  token = request.COOKIES.get('jwt')
+
+        # if not token:
+        #     return None
+        
         auth_data = authentication.get_authorization_header(request)
         print('auth_data', auth_data)
-        
+
         if not auth_data:
             return None
 

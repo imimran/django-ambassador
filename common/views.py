@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
@@ -47,7 +48,31 @@ class LoginAPIView(APIView):
         jwt_auth = JWTAuth()
         token = jwt_auth.generate_jwt(user.id, user.email)
 
+        # Set Token in cookies
+        # response = Response()
+        # response.set_cookie(key='jwt', value=token, httponly=True)
+        # response.data = {
+        #     'message': 'success'
+        # }
+
+        # return response
+
         return Response({ 'error': False, "msg": "login Successfuly", "user": serializer.data, "token": token})    
+
+
+
+# class LogoutAPIView(APIView):
+#     """Backend logout"""
+#     authentication_classes = [JWTAuth]
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, _):
+#         response = Response()
+#         response.delete_cookie(key='jwt')
+#         response.data = {
+#             'message': 'success'
+#         }
+#         return response
 
 
 class UserAPIView(APIView):
@@ -58,3 +83,34 @@ class UserAPIView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response({ 'error': False, 'user': serializer.data })
+
+
+class ProfileInfoAPIView(APIView):
+    permission_classes = [IsAuthenticated,]
+    authentication_classes = [JWTAuth]
+
+    def put(self, request, pk=None):
+        user = request.user
+        serializer = UserSerializer(user, request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'error': False, 'user': serializer.data})
+
+
+class ProfilePasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated,]
+    authentication_classes = [JWTAuth]
+
+    def put(self, request, pk=None):
+        user = request.user
+        data = request.data
+
+        if data['password'] != data['password_confirm']:
+            raise exceptions.APIException({ 'error': True, 'msg': 'Passwords do not match!'})
+
+        user.set_password(data['password'])
+        user.save()
+        serializer = UserSerializer(user)
+
+        return Response({ 'error': False, 'data': serializer.data })    
