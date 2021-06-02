@@ -42,7 +42,7 @@ class ProductGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
         return self.create(request)
 
     def put(self, request, pk=None):
-        return self.partial_update(request, pk)
+        return self.partial_update(request, pk )
 
     def delete(self, request, pk=None):
         return self.destroy(request, pk)
