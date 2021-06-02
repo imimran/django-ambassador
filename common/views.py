@@ -1,10 +1,13 @@
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework import exceptions
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 
 from core.models import User
 from .serializers import UserSerializer
+from common.auth import JWTAuth
 
 class RegisterAPIView(APIView):
    
@@ -37,9 +40,21 @@ class LoginAPIView(APIView):
         if user is None:
             raise exceptions.AuthenticationFailed({ "error": True, "msg":'User not found!'})
 
-
         if not user.check_password(password):
             raise exceptions.AuthenticationFailed({ "error": True, "msg": "Incorrect Password"})
 
         serializer = UserSerializer(user)
-        return Response({ 'error': False, "msg": "login Successfuly", "user": serializer.data})    
+        jwt_auth = JWTAuth()
+        token = jwt_auth.generate_jwt(user.id, user.email)
+
+        return Response({ 'error': False, "msg": "login Successfuly", "user": serializer.data, "token": token})    
+
+
+class UserAPIView(APIView):
+
+    permission_classes = [IsAuthenticated,]
+    authentication_classes = [JWTAuth]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response({ 'error': False, 'user': serializer.data })
