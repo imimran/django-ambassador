@@ -1,8 +1,8 @@
-from administrator.serializers import ProductSerializer
+from administrator.serializers import LinkSerializer, OrderSerializer, ProductSerializer
 from rest_framework import generics, mixins
 from rest_framework.response import Response
 from common.serializers import UserSerializer
-from core.models import User
+from core.models import Link, Order, User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -46,3 +46,26 @@ class ProductGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
 
     def delete(self, request, pk=None):
         return self.destroy(request, pk)
+
+
+class LinkAPIView(APIView):
+
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [JWTAuth]
+
+    def get(self, request, pk):
+        link = Link.objects.filter(user_id=pk)
+        serializer =LinkSerializer(link, many=True)
+        return Response({
+            'error': False, 'data': serializer.data
+        })
+
+
+class OrderAPIView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [JWTAuth]
+
+    def get(self, request):
+        orders = Order.objects.filter(complete=True)
+        serializer = OrderSerializer(orders, many=True)
+        return Response({ 'error': False, 'data': serializer.data })

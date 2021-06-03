@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from core.models import User
+from rest_framework.serializers import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
 
+
     def create(self, validated_data):
         #For Hash Password
         password = validated_data.pop('password', None)
@@ -17,4 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
         if password is not None:
             instance.set_password(password)
         instance.save()
-        return instance    
+        return instance 
+
+    # def validate_first_name(self, first_name):
+    #     if first_name is None:
+    #         raise serializers.ValidationError({'msg' : 'first_name is invalid'})    
+         

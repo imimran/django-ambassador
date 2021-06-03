@@ -33,7 +33,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user  
-        
+
 
 class User(AbstractUser):
     """ Use this option if you are happy with the existing fields 
@@ -84,6 +84,34 @@ class Link(models.Model):
     code = models.CharField(max_length=255, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ManyToManyField(Product)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updateAt = models.DateTimeField(auto_now=True)
+
+
+class Order(models.Model):
+    transection_id = models.CharField(max_length=255, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    code = models.CharField(max_length=255)
+    ambassador_email = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True)
+    area = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    zip = models.CharField(max_length=255, null=True)
+    complete = models.BooleanField(default=False)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updateAt = models.DateTimeField(auto_now=True)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    product_title = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField()
+    admin_revenue = models.DecimalField(max_digits=10, decimal_places=2)
+    ambassador_revenue = models.DecimalField(max_digits=10, decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updateAt = models.DateTimeField(auto_now=True)
 
