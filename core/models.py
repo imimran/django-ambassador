@@ -33,9 +33,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user  
-
-
-
+        
 
 class User(AbstractUser):
     """ Use this option if you are happy with the existing fields 
@@ -80,3 +78,13 @@ class Product(models.Model):
     description = models.TextField(max_length=1000, null=True)
     image = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Link(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ManyToManyField(Product)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updateAt = models.DateTimeField(auto_now=True)
+
+
