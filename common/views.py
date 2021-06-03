@@ -22,7 +22,7 @@ class RegisterAPIView(APIView):
         if data['password'] != data['password_confirm']:
             raise exceptions.APIException({ 'error': True, 'msg': 'Passwords do not match!'})
 
-        data['is_ambassador'] = 0
+        data['is_ambassador'] = 'api/amassador' in request.path
 
         serializer = UserSerializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -46,7 +46,10 @@ class LoginAPIView(APIView):
 
         serializer = UserSerializer(user)
         jwt_auth = JWTAuth()
-        token = jwt_auth.generate_jwt(user.id, user.email)
+
+        scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
+
+        token = jwt_auth.generate_jwt(user.id, user.email, scope)
 
         # Set Token in cookies
         # response = Response()

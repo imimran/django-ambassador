@@ -12,6 +12,7 @@ from core.models import User
 class JWTAuth(BaseAuthentication):
 
     def authenticate(self, request):
+        is_ambassador = 'api/ambassador' in request.path
         #Check User Authentication
 
         #  token = request.COOKIES.get('jwt')
@@ -34,8 +35,15 @@ class JWTAuth(BaseAuthentication):
             raise exceptions.AuthenticationFailed({
                 'error': True, 'msg': 'Your token is invalid'})
 
+    
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed({ 'error': True, 'msg': 'Your token is expired'})
+
+
+
+        if(is_ambassador and payload['scope']) != 'ambassador' or (not is_ambassador and payload['scope'] != 'admin'):
+             raise exceptions.AuthenticationFailed({
+                'error': True, 'msg': 'Invalid Scope '})
 
         user = User.objects.get(pk=payload['user_id'])
 
@@ -45,10 +53,11 @@ class JWTAuth(BaseAuthentication):
         return (user, None)
 
     # Crete JWT
-    def generate_jwt(self, id, email):
+    def generate_jwt(self, id, email, scope):
         payload = {
             'user_id': id,
             'email': email,
+            'scope': scope,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
             'iat': datetime.datetime.utcnow()
         }
