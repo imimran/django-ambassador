@@ -41,9 +41,9 @@ class JWTAuth(BaseAuthentication):
 
 
 
-        if(is_ambassador and payload['scope']) != 'ambassador' or (not is_ambassador and payload['scope'] != 'admin'):
+        if (is_ambassador and payload['scope'] != 'ambassador') or (not is_ambassador and payload['scope'] != 'admin'):
              raise exceptions.AuthenticationFailed({
-                'error': True, 'msg': 'Invalid Scope '})
+                'error': True, 'msg': 'Invalid Scope'})
 
         user = User.objects.get(pk=payload['user_id'])
 
