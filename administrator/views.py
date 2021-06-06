@@ -28,7 +28,7 @@ class ProductGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
                             mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     permission_classes = [IsAuthenticated, ]
     authentication_classes = [JWTAuth]
-
+    print('permission_classes', permission_classes)
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 

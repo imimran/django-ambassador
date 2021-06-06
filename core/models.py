@@ -54,6 +54,16 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    # @property
+    # def name(self):
+    #     return self.first_name + " " + self.last_name
+
+    @property
+    def revenue(self):
+        orders = Order.objects.filter(user_id = self.pk, complete = True)
+        return sum(o.ambassador_revenue for o in orders)
+
+
 
 
 # class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -105,6 +115,16 @@ class Order(models.Model):
     complete = models.BooleanField(default=False)
     createdAt = models.DateTimeField(auto_now_add=True)
     updateAt = models.DateTimeField(auto_now=True)
+
+    # @property
+    # def name(self):
+    #     return self.first_name + " " + self.last_name
+
+    @property
+    def ambassador_revenue (self):
+        items = OrderItem.objects.filter(order_id = self.pk)
+        return sum(i.ambassador_revenue for i in items)
+
 
 
 class OrderItem(models.Model):

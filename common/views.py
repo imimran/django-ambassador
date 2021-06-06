@@ -91,8 +91,13 @@ class UserAPIView(APIView):
     authentication_classes = [JWTAuth]
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response({ 'error': False, 'user': serializer.data })
+        user = request.user
+        serializer = UserSerializer(user).data
+        
+        if 'api/ambassador' in request.path:
+            serializer['revenue'] = user.revenue
+
+        return Response({ 'error': False, 'user': serializer })
 
 
 class ProfileInfoAPIView(APIView):
