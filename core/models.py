@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.is_admin = False
         user.is_staff = False
+        user.is_ambassador = False
         user.save(using=self._db)
         return user  
 
@@ -31,6 +32,7 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_ambassador = False
         user.save(using=self._db)
         return user  
 
@@ -41,7 +43,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(_('email address'), unique=True)
-    is_ambassador = models.CharField(max_length=255)
+    is_ambassador = models.BooleanField(default=True)
     username = None
 
     USERNAME_FIELD = 'email'
